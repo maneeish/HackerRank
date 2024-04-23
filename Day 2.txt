@@ -1,0 +1,28 @@
+
+//Day 2
+import java.util.Scanner;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Read input
+        int i = scanner.nextInt();
+        double d = scanner.nextDouble();
+        scanner.nextLine(); // Consume newline character
+        String s = scanner.nextLine();
+
+        // Perform operations
+        int sumInt = i + 4;
+        double sumDouble = d + 4.0;
+        String concatString = "HackerRank " + s;
+
+        // Print results
+        System.out.println(sumInt);
+        System.out.printf("%.1f\n", sumDouble);
+        System.out.println(concatString);
+
+        scanner.close();
+    }
+}
