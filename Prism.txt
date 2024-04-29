@@ -1,0 +1,101 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.util.regex.*;
+import java.util.stream.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
+
+class Result {
+
+    public static int prims(int n, List<List<Integer>> edges, int start) {
+        // Adjacency list to represent the graph
+        Map<Integer, List<int[]>> graph = new HashMap<>();
+        
+        // Fill the graph adjacency list
+        for (List<Integer> edge : edges) {
+            int u = edge.get(0);
+            int v = edge.get(1);
+            int weight = edge.get(2);
+            graph.computeIfAbsent(u, k -> new ArrayList<>()).add(new int[]{v, weight});
+            graph.computeIfAbsent(v, k -> new ArrayList<>()).add(new int[]{u, weight});
+        }
+        
+        // Priority queue to pick the minimum weight edge
+        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+        pq.offer(new int[]{start, 0}); // Start from the given start node
+        Set<Integer> visited = new HashSet<>();
+        int minWeight = 0;
+
+        while (!pq.isEmpty()) {
+            int[] curr = pq.poll();
+            int node = curr[0];
+            int weight = curr[1];
+            
+            if (visited.contains(node)) {
+                continue;
+            }
+            
+            // Add current node to the MST
+            visited.add(node);
+            minWeight += weight;
+            
+            // Explore neighbors
+            List<int[]> neighbors = graph.getOrDefault(node, new ArrayList<>());
+            for (int[] neighbor : neighbors) {
+                int nextNode = neighbor[0];
+                int edgeWeight = neighbor[1];
+                if (!visited.contains(nextNode)) {
+                    pq.offer(new int[]{nextNode, edgeWeight});
+                }
+            }
+        }
+        
+        return minWeight;
+    }
+
+}
+
+
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        String[] firstMultipleInput = bufferedReader.readLine().replaceAll("\\s+$", "").split(" ");
+
+        int n = Integer.parseInt(firstMultipleInput[0]);
+
+        int m = Integer.parseInt(firstMultipleInput[1]);
+
+        List<List<Integer>> edges = new ArrayList<>();
+
+        IntStream.range(0, m).forEach(i -> {
+            try {
+                edges.add(
+                    Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(" "))
+                        .map(Integer::parseInt)
+                        .collect(toList())
+                );
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        int start = Integer.parseInt(bufferedReader.readLine().trim());
+
+        int result = Result.prims(n, edges, start);
+
+        bufferedWriter.write(String.valueOf(result));
+        bufferedWriter.newLine();
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}

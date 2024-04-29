@@ -1,0 +1,110 @@
+//Kruskal MST
+//Luis Ramirez
+//Minimum Spanning Tree using ranks and subets 
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+
+class Result {
+  // type of subset,with parent and rank as attributes
+       static class subset{
+         int parent,rank;
+       }
+  // find set that represent the current vertex 
+      static int find(subset subsets[],int i){
+        if(subsets[i].parent == i){
+          return i;
+        }
+        return find(subsets,subsets[i].parent);
+      }
+  // function for adding edges whose vertex belong to a different set 
+  // 
+      static void union(subset subsets[],int x, int y){
+        int xRoot = find(subsets,x);// subset of the source
+        int yRoot = find(subsets,y);// subset of the destination
+        if(subsets[xRoot].rank > subsets[yRoot].rank)
+          subsets[yRoot].parent = xRoot;
+        else if(subsets[xRoot].rank < subsets[yRoot].rank)
+          subsets[xRoot].parent = yRoot;
+      // the parent of the destination is the source
+      // and source has a higher rank
+        else{
+          subsets[yRoot].parent = xRoot;
+         subsets[xRoot].rank++;
+        }
+          
+      }
+        public static int kruskals(int gNodes, List<Integer> gFrom, List<Integer> gTo, List<Integer> gWeight) {
+          int result = 0;
+        // sorted the arrays according to the values in the gWeight List
+        // using bubble sort 
+          for(int i =0; i < gWeight.size()-1 ;i++){
+                 for( int j =0; j < gWeight.size()-1-i; j++){
+                     if(gWeight.get(j)>gWeight.get(j+1)){
+                      Collections.swap(gWeight,j,j+1);
+                      Collections.swap(gFrom,j,j+1);
+                       Collections.swap(gTo,j,j+1);
+                     }
+                 }
+              }
+        // create an array of subsets with the size of the vertices
+        // each vertex been its own parent and having no child
+          subset sets[] = new subset[gNodes];
+          for(int i = 0; i < gNodes;i++){
+            sets[i] = new subset();
+            sets[i].parent = i;
+            sets[i].rank = 0;
+          }
+          int e = 0,i = 0;
+        // checks that the number of edges is less the number of vertices 
+          while(e < gNodes - 1){
+            int x = find(sets,gFrom.get(i)-1);// get the set for the source
+            int y = find(sets,gTo.get(i)-1);// get the source of the destination
+          // if the source and destination dont belong to the same subset
+          // add the corresponfing weight and put the vertices to the same set
+            if(x != y){
+              result += gWeight.get(i);
+              e++;
+              union(sets,x,y);
+            }
+            i++;
+          }
+          return result;
+
+        }
+
+    }
+public class Guess {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        
+
+        String[] gNodesEdges = bufferedReader.readLine().replaceAll("\\s+$", "").split(" ");
+
+        int gNodes = Integer.parseInt(gNodesEdges[0]);
+        int gEdges = Integer.parseInt(gNodesEdges[1]);
+
+        List<Integer> gFrom = new ArrayList<>();
+        List<Integer> gTo = new ArrayList<>();
+        List<Integer> gWeight = new ArrayList<>();
+
+        for (int i = 0; i < gEdges; i++) {
+            String[] gFromToWeight = bufferedReader.readLine().replaceAll("\\s+$", "").split(" ");
+
+            gFrom.add(Integer.parseInt(gFromToWeight[0]));
+            gTo.add(Integer.parseInt(gFromToWeight[1]));
+            gWeight.add(Integer.parseInt(gFromToWeight[2]));
+        }
+
+        int res = Result.kruskals(gNodes, gFrom, gTo, gWeight);
+
+        System.out.print(res);
+        bufferedReader.close();
+       
+    }
+
+}
